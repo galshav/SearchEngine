@@ -1,4 +1,5 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 
 namespace App.UnitTests {
@@ -13,7 +14,7 @@ namespace App.UnitTests {
                 "This is sentence #1",
                 "This is sentence #2",
             };
-            
+
             var index = Framework.Index.CreateIndex(data: book);
             Assert.AreEqual(expected: 1, actual: index["#1"].Count);
             Assert.AreEqual(expected: 1, actual: index["#2"].Count);
@@ -37,14 +38,14 @@ namespace App.UnitTests {
             var expressionTree = new Framework.ExpressionTree(
                 new Framework.Node()
                 {
-                    Data  = "&&",
-                    Left  = new Framework.Node() { Data = "Today"},
-                    Right = new Framework.Node() { Data = "Sunday"}
+                    Data = "&&",
+                    Left = new Framework.Node() { Data = "Today" },
+                    Right = new Framework.Node() { Data = "Sunday" }
                 });
-            
-            Assert.AreEqual(expected: "Today" , actual: expressionTree.Root.Left.Data);
+
+            Assert.AreEqual(expected: "Today", actual: expressionTree.Root.Left.Data);
             Assert.AreEqual(expected: "Sunday", actual: expressionTree.Root.Right.Data);
-            Assert.AreEqual(expected: "&&"    , actual: expressionTree.Root.Data);
+            Assert.AreEqual(expected: "&&", actual: expressionTree.Root.Data);
         }
 
         [TestMethod]
@@ -52,32 +53,32 @@ namespace App.UnitTests {
         {
             var leftSubExpression = new Framework.Node()
             {
-                Data  = "&&",
-                Left  = new Framework.Node() { Data = "Today" },
+                Data = "&&",
+                Left = new Framework.Node() { Data = "Today" },
                 Right = new Framework.Node() { Data = "Sunday" },
             };
 
             var rightSubExpression = new Framework.Node()
             {
-                Data  = "||",
-                Left  = new Framework.Node() { Data = "Not" },
+                Data = "||",
+                Left = new Framework.Node() { Data = "Not" },
                 Right = new Framework.Node() { Data = "Tomorrow" },
             };
 
             var expression = new Framework.ExpressionTree(
                 new Framework.Node()
                 {
-                    Data  = "||",
-                    Left  = leftSubExpression,
+                    Data = "||",
+                    Left = leftSubExpression,
                     Right = rightSubExpression,
                 });
 
-            Assert.AreEqual(expected: "||"      , actual: expression.Root.Data);
-            Assert.AreEqual(expected: "||"      , actual: expression.Root.Right.Data);
-            Assert.AreEqual(expected: "&&"      , actual: expression.Root.Left.Data);
-            Assert.AreEqual(expected: "Today"   , actual: expression.Root.Left.Left.Data);
-            Assert.AreEqual(expected: "Sunday"  , actual: expression.Root.Left.Right.Data);
-            Assert.AreEqual(expected: "Not"     , actual: expression.Root.Right.Left.Data);
+            Assert.AreEqual(expected: "||", actual: expression.Root.Data);
+            Assert.AreEqual(expected: "||", actual: expression.Root.Right.Data);
+            Assert.AreEqual(expected: "&&", actual: expression.Root.Left.Data);
+            Assert.AreEqual(expected: "Today", actual: expression.Root.Left.Left.Data);
+            Assert.AreEqual(expected: "Sunday", actual: expression.Root.Left.Right.Data);
+            Assert.AreEqual(expected: "Not", actual: expression.Root.Right.Left.Data);
             Assert.AreEqual(expected: "Tomorrow", actual: expression.Root.Right.Right.Data);
         }
 
@@ -87,8 +88,8 @@ namespace App.UnitTests {
             var searchFilter = new Framework.ExpressionTree(
                 new Framework.Node()
                 {
-                    Data  = "Sunday",
-                    Left  = null,
+                    Data = "Sunday",
+                    Left = null,
                     Right = null,
                 });
 
@@ -136,8 +137,8 @@ namespace App.UnitTests {
         {
             var searchFilter = new Framework.Node()
             {
-                Data  = "&&",
-                Left  = new Framework.Node() { Data = "Today" },
+                Data = "&&",
+                Left = new Framework.Node() { Data = "Today" },
                 Right = new Framework.Node() { Data = "Sunday" },
             };
 
@@ -230,6 +231,31 @@ namespace App.UnitTests {
             Assert.AreEqual(expected: "Today is not Monday", actual: dataset[indices[1]]);
             Assert.AreEqual(expected: "Tomorrow is Tuesday", actual: dataset[indices[2]]);
             Assert.AreEqual(expected: "Tomorrow isn't Wednesday", actual: dataset[indices[3]]);
+        }
+
+        [TestMethod]
+        public void SearchEngine_SearchExpression_InvalidExpression()
+        {
+            var searchFilter = new Framework.Node()
+            {
+                Data = "**",
+                Left = new Framework.Node() { Data = "Today" },
+                Right = new Framework.Node() { Data = "Sunday" },
+            };
+
+            var dataset = new List<string>()
+            {
+                "Today is Sunday",
+                "Today is not Monday",
+                "Tomorrow is Tuesday",
+                "Tomorrow isn't Wednesday"
+            };
+
+            var searchEngine = new Framework.SearchEngine(dataset: dataset);
+            Assert.ThrowsException<ArgumentException>(()=>
+            {
+                searchEngine.Search(searchFilter: searchFilter); 
+            });
         }
     }
 }
