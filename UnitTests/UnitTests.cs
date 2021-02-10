@@ -82,7 +82,7 @@ namespace App.UnitTests {
         }
 
         [TestMethod]
-        public void SearchEngine_SearchExpression_SingleWord()
+        public void SearchEngine_SearchExpression_SingleWordExist()
         {
             var searchFilter = new Framework.ExpressionTree(
                 new Framework.Node()
@@ -104,6 +104,31 @@ namespace App.UnitTests {
             var indices = searchEngine.Search(searchFilter: searchFilter.Root);
             Assert.AreEqual(expected: 1, actual: indices.Count);
             Assert.AreEqual(expected: 0, actual: indices[0]);
+            Assert.AreEqual(expected: "Today is Sunday", actual: dataset[indices[0]]);
+        }
+
+        [TestMethod]
+        public void SearchEngine_SearchExpression_SingleWordNotExist()
+        {
+            var searchFilter = new Framework.ExpressionTree(
+                new Framework.Node()
+                {
+                    Data = "Friday",
+                    Left = null,
+                    Right = null,
+                });
+
+            var dataset = new List<string>()
+            {
+                "Today is Sunday",
+                "Today is not Monday",
+                "Tomorrow is Tuesday",
+                "Tomorrow isn't Wednesday"
+            };
+
+            var searchEngine = new Framework.SearchEngine(dataset: dataset);
+            var indices = searchEngine.Search(searchFilter: searchFilter.Root);
+            Assert.AreEqual(expected: 0, actual: indices.Count);
         }
 
         [TestMethod]
@@ -128,6 +153,7 @@ namespace App.UnitTests {
             var indices = searchEngine.Search(searchFilter: searchFilter);
             Assert.AreEqual(expected: 1, actual: indices.Count);
             Assert.AreEqual(expected: 0, actual: indices[0]);
+            Assert.AreEqual(expected: "Today is Sunday", actual: dataset[indices[0]]);
         }
 
         [TestMethod]
@@ -155,6 +181,10 @@ namespace App.UnitTests {
             Assert.AreEqual(expected: 1, actual: indices[1]);
             Assert.AreEqual(expected: 2, actual: indices[2]);
             Assert.AreEqual(expected: 3, actual: indices[3]);
+            Assert.AreEqual(expected: "Today is Sunday", actual: dataset[indices[0]]);
+            Assert.AreEqual(expected: "Today is not Monday", actual: dataset[indices[1]]);
+            Assert.AreEqual(expected: "Tomorrow is Tuesday", actual: dataset[indices[2]]);
+            Assert.AreEqual(expected: "Tomorrow isn't Wednesday", actual: dataset[indices[3]]);
         }
 
         [TestMethod]
@@ -196,6 +226,10 @@ namespace App.UnitTests {
             Assert.AreEqual(expected: 1, actual: indices[1]);
             Assert.AreEqual(expected: 2, actual: indices[2]);
             Assert.AreEqual(expected: 3, actual: indices[3]);
+            Assert.AreEqual(expected: "Today is Sunday", actual: dataset[indices[0]]);
+            Assert.AreEqual(expected: "Today is not Monday", actual: dataset[indices[1]]);
+            Assert.AreEqual(expected: "Tomorrow is Tuesday", actual: dataset[indices[2]]);
+            Assert.AreEqual(expected: "Tomorrow isn't Wednesday", actual: dataset[indices[3]]);
         }
     }
 }
